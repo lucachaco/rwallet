@@ -6,6 +6,13 @@ if (isEmpty(PARSE_SERVER_URL)) {
   throw new Error('PARSE_SERVER_URL needs to be defined in .env under the root.');
 }
 
+console.log('****************************************************************');
+console.log({ PARSE_SERVER_URL });
+console.log({ RWALLET_API_KEY });
+console.log({ RWALLET_ENV });
+console.log('****************************************************************');
+
+
 const config = {
 
   parse: {

@@ -250,10 +250,12 @@ class ParseHelper {
    * @memberof ParseHelper
    */
   static async fetchTransactions(symbol, type, address, skipCount, fetchCount) {
+    // .ito - lowercasing this address works better, without this we can't see the tx
+    // when Parse.Cloud is called it looks like it calls an endpoint that we can control, but when not then we need to change it here as well
     const queryFrom = new Parse.Query(ParseTransaction);
-    queryFrom.equalTo('from', address);
+    queryFrom.equalTo('from', address.toLowerCase());
     const queryTo = new Parse.Query(ParseTransaction);
-    queryTo.equalTo('to', address);
+    queryTo.equalTo('to', address.toLowerCase());
     const query = Parse.Query.or(queryFrom, queryTo)
       .equalTo('type', type)
       .equalTo('symbol', symbol)
@@ -261,7 +263,7 @@ class ParseHelper {
     const results = await query.skip(skipCount).limit(fetchCount).find();
     const transactions = _.map(results, (item) => {
       const transaction = parseDataUtil.getTransaction(item);
-      const isSender = address === transaction.from;
+      const isSender = address.toLowerCase() === transaction.from.toLowerCase();
       return parseDataUtil.getTransactionViewData(transaction, isSender);
     });
     return transactions;
@@ -272,7 +274,8 @@ class ParseHelper {
    * @param {*} tokens
    */
   static async subscribeTransactions(tokens) {
-    const addresses = _.uniq(_.map(tokens, 'address'));
+    const addresses = (_.uniq(_.map(tokens, 'address'))).map((x) => x.toLowerCase());
+    // .ito
     const queryFrom = new Parse.Query(ParseTransaction);
     queryFrom.containedIn('from', addresses);
     const queryTo = new Parse.Query(ParseTransaction);
