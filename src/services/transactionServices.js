@@ -5,9 +5,6 @@ import Transaction from '../common/transaction';
 const buildTransaction = async ({
   memo, amount, coin, feeParams, toAddress, isRequestSendAll,
 }) => {
-  console.log({
-    memo, amount, coin, feeParams, toAddress, isRequestSendAll,
-  });
   const {
     symbol, balance, precision,
   } = coin;
@@ -37,7 +34,6 @@ const broadcastTransaction = async ({
   const transaction = await buildTransaction({
     memo, amount, coin, feeParams, toAddress, isRequestSendAll,
   });
-  console.log({ transaction });
   await transaction.broadcast();
 
   return transaction;
