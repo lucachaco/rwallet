@@ -24,6 +24,31 @@ const legacyBtcInputPartialFunds={
         type: "Testnet"
     }
 }
+const balance1 = new BigNumber(6300);
+const legacyBtcInputAllFunds = {
+    amount: "0.013872",
+    coin: {
+        account: "0",
+        address: "mhZqaFNCaiAsPFddcWKLoCWeQVMpKtQDCv",
+        balance:balance1,
+        addressType: "legacy",
+        chain: "Bitcoin",
+        coinType: 1,
+        id: "BTCTestnet",
+        metadata: {networkId: 1, coinType: 1, icon: 9, defaultName: "Bitcoin"},
+        networkId: 1,
+        objectId: "bkS3VQUp10",
+        path: "m/44'/1'/0'/0/0",
+        precision: 18,
+        privateKey: "e11f52cddd13a5399159eda45b9a9d84b14e45956f5c92b9cb2b746a9549f499",
+        symbol: "BTC",
+        type: "Testnet"
+    },
+    feeParams: { fees: "0x3035" },
+    isRequestSendAll: true,
+    memo: null,
+    toAddress: "mfyxgzeNZcBarGhRf5WoB6cFKCmcaoiNJp",
+}
 
 const segwitBtcInputPartialFunds = {
     amount: "0.001",
@@ -128,7 +153,7 @@ const segwitRbtcInputPartialFunds ={
 
 
 describe('Transaction Services', () => {
-    it('should build a transaction with a legacy BTC address', async () => {
+    it('should build a transaction with a legacy BTC address when sending partial funds', async () => {
         const builtTransaction = await buildTransaction(legacyBtcInputPartialFunds);
         expect(builtTransaction).toHaveProperty('receiver');
         expect(builtTransaction.receiver).toBe(legacyBtcInputPartialFunds.toAddress);
@@ -138,6 +163,19 @@ describe('Transaction Services', () => {
         expect(builtTransaction.symbol).toBe(legacyBtcInputPartialFunds.coin.symbol);
         expect(builtTransaction).toHaveProperty('value');
         expect(builtTransaction.value).toBe(common.convertCoinAmountToUnitHex(legacyBtcInputPartialFunds.coin.symbol,legacyBtcInputPartialFunds.amount,legacyBtcInputPartialFunds.coin.precision));
+    });
+
+    it('should build a transaction with a legacy BTC address when sending all funds', async () => {
+        const builtTransaction = await buildTransaction(legacyBtcInputAllFunds);
+        expect(builtTransaction).toHaveProperty('receiver');
+        expect(builtTransaction.receiver).toBe(legacyBtcInputAllFunds.toAddress);
+        expect(builtTransaction).toHaveProperty('sender');
+        expect(builtTransaction.sender).toBe(legacyBtcInputAllFunds.coin.address);
+        expect(builtTransaction).toHaveProperty('symbol');
+        expect(builtTransaction.symbol).toBe(legacyBtcInputAllFunds.coin.symbol);
+        expect(builtTransaction).toHaveProperty('value');
+        const value = legacyBtcInputAllFunds.coin.balance.minus(common.convertUnitToCoinAmount(legacyBtcInputAllFunds.coin.symbol, legacyBtcInputAllFunds.feeParams.fees, legacyBtcInputAllFunds.coin.precision));
+        expect(builtTransaction.value).toBe(common.convertCoinAmountToUnitHex(legacyBtcInputAllFunds.coin.symbol,value,legacyBtcInputAllFunds.coin.precision));
     });
 
     it('should build a transaction with a segwit BTC address when sending partial funds', async () => {
