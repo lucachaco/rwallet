@@ -35,6 +35,7 @@ const broadcastTransaction = async ({
     memo, amount, coin, feeParams, toAddress, isRequestSendAll,
   });
   await transaction.broadcast();
+
   return transaction;
 };
 
