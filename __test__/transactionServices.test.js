@@ -101,6 +101,31 @@ const segwitRbtcInputAllFunds={
     }
 }
 
+const segwitRbtcInputPartialFunds ={
+    amount: "0.001",
+    coin: {
+        account: "0",
+        address: "0x2FA4a8A4cFF02Efa4368a1e8c3301C5342D3b879",
+        chain: "Rootstock",
+        coinType: 37310,
+        contractAddress: undefined,
+        id: "RBTCTestnet",
+        metadata: {networkId: 31, coinType: 37310, icon: 10, defaultName: "Smart Bitcoin", chain: "Rootstock"},
+        name: "Smart Bitcoin",
+        networkId: 31,
+        objectId: "gOrOxEcFeQ",
+        path: "m/44'/37310'/0'/0/0",
+        precision: 18,
+        privateKey: "b265c01217804948d490d17b7383d61daf1991f87f1f5ae87b3ad0f84bf967e0",
+        symbol: "RBTC",
+        type: "Testnet"
+    },
+    feeParams: {gas: BigNumber, gasPrice: "117295200"},
+    isRequestSendAll: false,
+    memo: null,
+    toAddress: "0xe4CAE969f26E093874728272dcFED1074f4778F5"
+}
+
 
 describe('Transaction Services', () => {
     it('should build a transaction with a legacy BTC address', async () => {
@@ -140,7 +165,7 @@ describe('Transaction Services', () => {
         expect(builtTransaction.value).toBe(common.convertCoinAmountToUnitHex(segwitBtcInputAllFunds.coin.symbol,value,segwitBtcInputAllFunds.coin.precision));
     });
 
-    it('should build a transaction with a segwit RBTC address when sending all', async () => {
+    it('should build a transaction with a segwit RBTC address when sending all funds', async () => {
         const builtTransaction = await buildTransaction(segwitRbtcInputAllFunds);
         expect(builtTransaction).toHaveProperty('receiver');
         expect(builtTransaction.receiver).toBe(segwitRbtcInputAllFunds.toAddress.toLowerCase());
@@ -153,7 +178,18 @@ describe('Transaction Services', () => {
         expect(builtTransaction.value).toBe(common.convertCoinAmountToUnitHex(segwitRbtcInputAllFunds.coin.symbol,value,segwitRbtcInputAllFunds.coin.precision));
     });
 
+    it('should build a transaction with a segwit RBTC address when sending partial funds', async () => {
+        const builtTransaction = await buildTransaction(segwitRbtcInputPartialFunds);
+        expect(builtTransaction).toHaveProperty('receiver');
+        expect(builtTransaction.receiver).toBe(segwitRbtcInputPartialFunds.toAddress);
+        expect(builtTransaction).toHaveProperty('sender');
+        expect(builtTransaction.sender).toBe(segwitRbtcInputPartialFunds.coin.address);
+        expect(builtTransaction).toHaveProperty('symbol');
+        expect(builtTransaction.symbol).toBe(segwitRbtcInputPartialFunds.coin.symbol);
+        expect(builtTransaction).toHaveProperty('value');
+        expect(builtTransaction.value).toBe(common.convertCoinAmountToUnitHex(segwitRbtcInputPartialFunds.coin.symbol,segwitRbtcInputPartialFunds.amount,segwitRbtcInputPartialFunds.coin.precision));
+    });
+
 });
 
-/*    balance: BigNumber {s: 1, e: 0, c: Array(1)},
-    balanceValue: BigNumber {s: 1, e: 0, c: Array(1)},*/
+
